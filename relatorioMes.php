@@ -60,7 +60,7 @@ Highcharts.chart('container', {
         text: 'Fonte: Mercadinho Ltda.'
     },
     xAxis: {
-        categories: <?=$categories?>,
+        categories: [' '],
         crosshair: true
     },
     yAxis: {
