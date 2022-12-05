@@ -112,7 +112,7 @@ function adicionarAoCarrinho($id_produto, $id_venda, $quantidade, $preco){
 function relatorioDia(){
     $sql ="SELECT sum(quantidade) as total_vendas, to_char(data_venda, 'DD/MM/YYYY') as dia
     FROM venda_produto inner join venda on venda_produto.id_venda = venda.id WHERE data_venda > (CURRENT_DATE - 30)
-    group by dia order by dia;";
+    group by dia;";
     $resultado = pg_query(obterConexao(), $sql);
     if(pg_affected_rows($resultado) > 0){
         $arr = [];
@@ -139,10 +139,10 @@ function relatorioMes(){
                 'name' => $row['mes'],
                 'data' => array_map('intval', explode(',', $row['total_vendas']))
             );
-        $series_array[] = $arr;
+            $series_array[] = $arr;
         }
     }
-    return json_encode($series_array);
+    return $series_array;
 }
 
 function relatorioAno(){
@@ -159,4 +159,23 @@ function relatorioAno(){
         }
     }
     return json_encode($series_array);
+}
+
+function relatorioMesProduto(){
+    $sql = "SELECT quantidade, to_char(data_venda, 'MM/YYYY') as mes, produto.nome as nome_produto
+    FROM public.venda_produto inner join venda on venda_produto.id_venda = venda.id
+    inner join produto on venda_produto.id_produto = produto.id
+    WHERE data_venda > (CURRENT_DATE - 360) and produto.nome = 'picanha'
+    group by  quantidade, mes, to_char(data_venda, 'YYYY'), nome_produto order by to_char(data_venda, 'YYYY'), mes;";
+    $resultado = pg_query(obterConexao(), $sql);
+    if(pg_affected_rows($resultado) > 0){
+        while($row = pg_fetch_assoc($resultado)){
+            $arr = array (
+                'name' => $row['mes'],
+                'data' => array_map('intval', explode(',', $row['quantidade']))
+            );
+            $series_array[] = $arr;
+        }
+    }
+    return $series_array;
 }

@@ -1,9 +1,9 @@
 <?php 
 require_once 'banco.php';
-foreach(relatorioMes() as $nome){
+foreach(relatorioMesProduto() as $nome){
     $meses[] = $nome['name'];
 }
-$series = stripslashes(json_encode(relatorioMes()));
+$series = stripslashes(json_encode(relatorioMesProduto()));
 $categories = stripslashes(json_encode($meses));
 ?>
 
@@ -60,7 +60,7 @@ Highcharts.chart('container', {
         text: 'Fonte: Mercadinho Ltda.'
     },
     xAxis: {
-        categories: <?=$categories?>,
+        categories: ['picanha'],
         crosshair: true
     },
     yAxis: {
