@@ -23,9 +23,23 @@ require_once 'banco.php';
         echo 'Permissão não concedida, procure um gerente';
       }
       else{
-        echo '<form action="relatorioDia.php"><input type="submit" value="Relatório por dia" class="btn btn-primary mb-3"></form>
+        echo '
+        <div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6">
+        <h2>Relatórios simples</h2>
+        <form action="relatoriosSimples.php"><input type="submit" value="Relatórios simples" class="btn btn-primary mb-3"></form>
+        </div>
+        <div class="col-lg-6">
+        <h2>Relatórios Highcharts</h2>
+        <form action="relatorioDia.php"><input type="submit" value="Relatório por dia" class="btn btn-primary mb-3"></form>
         <form action="relatorioMes.php"><input type="submit" value="Relatório por mês" class="btn btn-primary mb-3"></form>
-        <form action="relatorioAno.php"><input type="submit" value="Relatório por ano" class="btn btn-primary mb-3"></form>';
+        <form action="relatorioAno.php"><input type="submit" value="Relatório por ano" class="btn btn-primary mb-3"></form>
+        </div>
+    </div>
+</div>
+        
+        ';
       };
       ?>
     

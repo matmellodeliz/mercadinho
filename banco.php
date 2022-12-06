@@ -161,21 +161,130 @@ function relatorioAno(){
     return json_encode($series_array);
 }
 
-function relatorioMesProduto(){
-    $sql = "SELECT quantidade, to_char(data_venda, 'MM/YYYY') as mes, produto.nome as nome_produto
+function relatorioDeProdutosDoDia(){
+    $sql = "
+    SELECT sum(quantidade) as vendidos, to_char(data_venda, 'DD') as dia, produto.nome as nome_produto
     FROM public.venda_produto inner join venda on venda_produto.id_venda = venda.id
     inner join produto on venda_produto.id_produto = produto.id
-    WHERE data_venda > (CURRENT_DATE - 360) and produto.nome = 'picanha'
-    group by  quantidade, mes, to_char(data_venda, 'YYYY'), nome_produto order by to_char(data_venda, 'YYYY'), mes;";
+    WHERE (data_venda >= (CURRENT_DATE::TEXT||' 00:00:00')::timestamp and data_Venda <= (CURRENT_DATE::TEXT||' 23:59:59')::timestamp)
+    group by  dia, nome_produto;";
     $resultado = pg_query(obterConexao(), $sql);
+    $dados = pg_fetch_all($resultado);
     if(pg_affected_rows($resultado) > 0){
-        while($row = pg_fetch_assoc($resultado)){
-            $arr = array (
-                'name' => $row['mes'],
-                'data' => array_map('intval', explode(',', $row['quantidade']))
-            );
-            $series_array[] = $arr;
-        }
+        return $dados;
     }
-    return $series_array;
+    else{
+        return [];
+    }
 }
+
+function relatorioDeCategoriasDoDia(){
+    $sql = "
+    SELECT sum(quantidade) as vendidos, to_char(data_venda, 'DD') as dia, categoria.nome as nome_categoria
+    FROM public.venda_produto inner join venda on venda_produto.id_venda = venda.id
+    inner join produto on venda_produto.id_produto = produto.id
+	inner join categoria on categoria.id = produto.id_categoria
+    WHERE (data_venda >= (CURRENT_DATE::TEXT||' 00:00:00')::timestamp and data_Venda <= (CURRENT_DATE::TEXT||' 23:59:59')::timestamp)
+    group by  dia, nome_categoria;";
+    $resultado = pg_query(obterConexao(), $sql);
+    $dados = pg_fetch_all($resultado);
+    if(pg_affected_rows($resultado) > 0){
+        return $dados;
+    }
+    else{
+        return [];
+    }
+}
+
+function relatorioDeProdutosDoMes(){
+    $sql = "
+    SELECT sum(quantidade) as vendidos, to_char(data_venda, 'DD/MM') as dia, produto.nome as nome_produto
+    FROM public.venda_produto inner join venda on venda_produto.id_venda = venda.id
+    inner join produto on venda_produto.id_produto = produto.id
+	inner join categoria on categoria.id = produto.id_categoria
+    WHERE (data_venda >= (CURRENT_DATE - interval '1 month')::timestamp and data_Venda <= (CURRENT_DATE::TEXT||' 23:59:59')::timestamp)
+    group by  dia, nome_produto order by dia;";
+    $resultado = pg_query(obterConexao(), $sql);
+    $dados = pg_fetch_all($resultado);
+    if(pg_affected_rows($resultado) > 0){
+        return $dados;
+    }
+    else{
+        return [];
+    }
+}
+
+function relatorioDeCategoriasDoMes(){
+    $sql = "
+    SELECT sum(quantidade) as vendidos, to_char(data_venda, 'DD/MM') as dia, categoria.nome as nome_categoria
+    FROM public.venda_produto inner join venda on venda_produto.id_venda = venda.id
+    inner join produto on venda_produto.id_produto = produto.id
+	inner join categoria on categoria.id = produto.id_categoria
+    WHERE (data_venda >= (CURRENT_DATE - interval '1 month')::timestamp and data_Venda <= (CURRENT_DATE::TEXT||' 23:59:59')::timestamp)
+    group by  dia, nome_categoria order by dia;";
+    $resultado = pg_query(obterConexao(), $sql);
+    $dados = pg_fetch_all($resultado);
+    if(pg_affected_rows($resultado) > 0){
+        return $dados;
+    }
+    else{
+        return [];
+    }
+}
+
+function relatorioDeProdutosDoAno(){
+    $sql = "
+    SELECT sum(quantidade) as vendidos, to_char(data_venda, 'MM') as mes, produto.nome as nome_produto
+    FROM public.venda_produto inner join venda on venda_produto.id_venda = venda.id
+    inner join produto on venda_produto.id_produto = produto.id
+	inner join categoria on categoria.id = produto.id_categoria
+    WHERE (data_venda >= (CURRENT_DATE - interval '1 year')::timestamp and data_Venda <= (CURRENT_DATE::TEXT||' 23:59:59')::timestamp)
+    group by  mes, nome_produto order by mes;";
+    $resultado = pg_query(obterConexao(), $sql);
+    $dados = pg_fetch_all($resultado);
+    if(pg_affected_rows($resultado) > 0){
+        return $dados;
+    }
+    else{
+        return [];
+    }
+}
+
+function relatorioDeCategoriasDoAno(){
+    $sql = "
+    SELECT sum(quantidade) as vendidos, to_char(data_venda, 'MM') as mes, categoria.nome as nome_categoria
+    FROM public.venda_produto inner join venda on venda_produto.id_venda = venda.id
+    inner join produto on venda_produto.id_produto = produto.id
+	inner join categoria on categoria.id = produto.id_categoria
+    WHERE (data_venda >= (CURRENT_DATE - interval '1 year')::timestamp and data_Venda <= (CURRENT_DATE::TEXT||' 23:59:59')::timestamp)
+    group by  mes, nome_categoria order by mes;";
+    $resultado = pg_query(obterConexao(), $sql);
+    $dados = pg_fetch_all($resultado);
+    if(pg_affected_rows($resultado) > 0){
+        return $dados;
+    }
+    else{
+        return [];
+    }
+}
+
+// precisa script pra escolher mes
+// function listarRelatorioMes($mes){
+//     $sql = "
+//     SELECT sum(quantidade) as vendidos, to_char(data_venda, 'DD/MM') as dia, categoria.nome as nome_categoria, data_venda
+//     FROM public.venda_produto inner join venda on venda_produto.id_venda = venda.id
+//     inner join produto on venda_produto.id_produto = produto.id
+// 	inner join categoria on categoria.id = produto.id_categoria
+// 	where extract(MONTH from data_venda) = $mes
+//     group by  dia, nome_categoria, data_venda order by dia;";
+//     $resultado = pg_query(obterConexao(), $sql);
+//     $dados = pg_fetch_all($resultado);
+//     if(pg_affected_rows($resultado) > 0){
+//         return $dados;
+//     }
+//     else{
+//         return [];
+//     }
+// }
+
+

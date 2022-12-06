@@ -116,15 +116,6 @@ switch ($acao) {
             $resultado = editarUsuario($id, $nome, $funcao, $login, $senha);
         }
     break;
-    case 'relatorioDia':
-        $resultado = relatorioDia();
-    break;
-    case 'relatorioMes':
-        $resultado = relatorioMes();
-    break;
-    case 'relatorioAno':
-        $resultado = relatorioAno();
-    break;
 }
 
 echo json_encode($resultado);
